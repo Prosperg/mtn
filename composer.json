@@ -1,0 +1,33 @@
+{
+    "name": "pkl/mtn-momo-sdk",
+    "description": "Un package Laravel pour faciliter l'intégration du moyen de paiement électronique de l'opérateur MTN Bénin",
+    "type": "library",
+    "require": {
+        "php": ">=8.1",
+        "illuminate/support": "^10.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Pkl\\Mtn\\MomoSdk\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pkl\\Mtn\\MomoSdk\\MtnMomoServiceProvider"
+            ],
+            "aliases": {
+                "MomoSdk": "Pkl\\Mtn\\MomoSdk\\Facades\\MomoSdk"
+            }
+        }
+    },
+    "authors": [
+        {
+            "name": "Koffi Prosper GOUTO",
+            "email": "promasdev@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
