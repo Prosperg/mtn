@@ -1,7 +1,7 @@
 {
     "name": "pkl/mtn-momo-sdk",
     "description": "Un package Laravel pour faciliter l'intégration du moyen de paiement électronique de l'opérateur MTN",
-    "version": "1.0.1",
+    "version": "v1.0.1",
     "type": "library",
     "require": {
         "php": "^7.3 || ^8.0",
