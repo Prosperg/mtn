@@ -14,9 +14,11 @@ composer require pkl/mtn-momo-sdk
 MTN_MOMO_ENV=sandbox # ou mtnbenin, etc.
 
 # Pour la collecte de fonds
+```
 MTN_MOMO_COLLECTION_PRIMARY_KEY=
 MTN_MOMO_COLLECTION_SECONDARY_KEY=
 MTN_MOMO_COLLECTION_CALLBACK_URL=
+```
 
 # Pour le transfert de fonds
 MTN_MOMO_DISBURSEMENT_PRIMARY_KEY=
