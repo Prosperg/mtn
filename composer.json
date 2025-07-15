@@ -1,6 +1,7 @@
 {
     "name": "pkl/mtn-momo-sdk",
-    "description": "Un package Laravel pour faciliter l'intégration du moyen de paiement électronique de l'opérateur MTN Bénin",
+    "description": "Un package Laravel pour faciliter l'intégration du moyen de paiement électronique de l'opérateur MTN",
+    "version": "1.0.0",
     "type": "library",
     "require": {
         "php": ">=8.1",

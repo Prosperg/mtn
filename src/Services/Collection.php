@@ -2,69 +2,96 @@
 
 namespace Pkl\Mtn\MomoSdk\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class Collection
 {
 
-    protected $config, $url;
+    protected $config, $url, $env;
     
     public function __construct(array $config, $url)
     {
         $this->config = $config['collection'];
         $this->url = $url;
+        $this->env = env("MTN_MOMO_ENV");
     }
     
-    public function requestToPay(string $referenceId, string $phoneNumber, float $amount, string $currency = 'EUR')
+    /**
+     * Summary of requestToPay
+     * @param string $payerPhoneNumber
+     * @param float $amount
+     * @param string $currency
+     * @param string $payerMessage
+     * @param string $payeeNote
+     * @throws \Exception
+     * @return array{paymentContent: mixed, referenceId: string, status: mixed}
+     */
+    public function requestToPay(string $payerPhoneNumber, float $amount, 
+    string $currency = 'EUR',string $payerMessage = "Aucun msg", string $payeeNote = "Aucune note")
     {
-        // Implémentez la logique pour initier un paiement
+        $referenceId = (string) Str::uuid();
+        $externalId = (int) Str::random(10);
+
         $body = [
             "amount" => $amount, // montant de l'operation
             "currency" => $currency, // la devise de l'operation
-            "externalId" => $referenceId, // reference
+            "externalId" => $externalId, // reference
             "payer" => [
                 "partyIdType" => "MSISDN",
-                "partyId" => $phoneNumber // le numero du client qui paie
+                "partyId" => $payerPhoneNumber // le numero du client qui paie
             ],
-            "payerMessage" => $message ?? "",
-            "payeeNote" => $message ?? ""
+            "payerMessage" => $payerMessage ?? "",
+            "payeeNote" => $payeeNote ?? ""
         ];
-        try {
-            $response = Http::withHeaders([
+
+        $response = Http::withHeaders([
                 'X-Reference-Id' => $referenceId,
-                'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
-                'Ocp-Apim-Subscription-Key' => env('MTN_OPC_APIM_SUB_KEY'),
+                'X-Target-Environment' => $this->env,
+                'Ocp-Apim-Subscription-Key' => $this->config["primary_key"],
                 'Content-Type' => 'application/json',
                 'Authorization' => "Bearer " . $this->generateToken()
-            ])->post($this->url."/collection/v1_0/requesttopay",["json"=>$body]);
+        ])->post($this->url."/collection/v1_0/requesttopay",$body);
 
-            if($response->getStatusCode() == 202)
-            {
-                sleep(15);
-                return $this->getPaymentStatus($referenceId);
-            }
-        } catch (\Throwable $th) {
-            $response = $th->getMessage();
-            return json_decode($response, true);
+        if(!$response->successful())
+        {
+            throw new Exception("Erreur lors de paiement par le client : ". $response->body());
         }
+
+        // Temporiseur
+        sleep(15);
+
+        // Vérification du status
+        $status =  $this->getRequestToPayStatus($referenceId);
+
+        return [
+            "referenceId"=>$referenceId,
+            "paymentContent"=>$response->body(),
+            "status"=>$status->body()
+        ];
     }
 
     /**
-     * Summary of getPaymentStatus
+     * Summary of getRequestToPayStatus
      * @param mixed $referenceId
      */
-    private function getPaymentStatus($referenceId)
+    public function getRequestToPayStatus($referenceId)
     {
         try {
             $response = Http::withHeaders([
-                'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
+                'X-Target-Environment' => $this->env,
                 'Ocp-Apim-Subscription-Key' => $this->config['primary_key'],
                 'Content-Type' => 'application/json',
                 'Authorization' => "Bearer " . $this->generateToken()
-            ])->get($this->url."/collection/v2_0/payment/$referenceId");
-            $re = $response->getBody()->getContents();
-            return json_decode($re, true);
+            ])->get($this->url."/collection/v1_0/requesttopay/$referenceId");
+
+            if(!$response->successful()){
+                throw new Exception("Erreur de vérification du status de paiement : ".$response->body());
+            }
+
+            return $response;
+
         } catch (\Throwable $th) {
             //throw $th;
             return $th->getMessage();
@@ -88,7 +115,7 @@ class Collection
         ])->post($this->url."/collection/token/");
     
         if (!$response->successful()) {
-            throw new \Exception("Erreur de génération du token : " . $response->body());
+            throw new Exception("Erreur de génération du token : " . $response->body());
         }
 
         // Récupérer le token
@@ -111,7 +138,7 @@ class Collection
 
         // Optionnel : vérifier que le code est bien 201
         if (!$res->successful()) {
-            throw new \Exception("Erreur création API_USER : " . $res->body());
+            throw new Exception("Erreur création API_USER : " . $res->body());
         }
         return $apiUser;
     }
@@ -127,7 +154,7 @@ class Collection
         ])->post($this->url."/v1_0/apiuser/$xReferenceId/apikey");
 
         if (!$response->successful()) {
-            throw new \Exception("Erreur création API_KEY : " . $response->body());
+            throw new Exception("Erreur création API_KEY : " . $response->body());
         }
         return $response->json('apiKey');
     }

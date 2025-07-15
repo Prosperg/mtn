@@ -12,11 +12,6 @@ class MtnMomoServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/mtn-momo.php', 'mtn-momo'
         );
-
-        // Enregistrer le service principal
-        // $this->app->singleton('mtn-momo-sdk', function ($app) {
-        //     return new \Pkl\Mtn\MomoSdk\MomoSdk();
-        // });
     }
 
     public function boot()

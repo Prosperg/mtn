@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class Disbursement
 {
-    protected $config, $url;
+    protected $config, $url,$env;
 
     /**
      * Summary of __construct
@@ -17,6 +17,7 @@ class Disbursement
     public function __construct(array $config, $url) {
         $this->config = $config["disbursement"];
         $this->url = $url;
+        $this->env = env("MTN_MOMO_ENV");
     }
 
     /**
@@ -46,7 +47,7 @@ class Disbursement
 
         $response = Http::withHeaders([
             'X-Reference-Id' => $referenceId,
-            'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
+            'X-Target-Environment' => $this->env,
             'Ocp-Apim-Subscription-Key' => $this->config["primary_key"],
             'Content-Type' => 'application/json',
             'Authorization' => "Bearer " . $this->generateToken()
@@ -76,7 +77,7 @@ class Disbursement
     public function checkOwnAccountBalance()
     {
         $response = Http::withHeaders([
-            'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
+            'X-Target-Environment' => $this->env,
             'Ocp-Apim-Subscription-Key' => $this->config["primary_key"],
             'Content-Type' => 'application/json',
             'Authorization' => "Bearer " . $this->generateToken()
@@ -98,7 +99,7 @@ class Disbursement
     {
         
         $response = Http::withHeaders([
-            'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
+            'X-Target-Environment' => $this->env,
             'Ocp-Apim-Subscription-Key' => $this->config["primary_key"],
             'Content-Type' => 'application/json',
             'Authorization' => "Bearer " . $this->generateToken()
@@ -113,6 +114,7 @@ class Disbursement
 
     /**
      * Summary of refundBalance
+     * Cette methode est utiliser pour rembouser un utilisateur de votre plateforme
      * @param mixed $amount
      * @param mixed $currence
      * @param mixed $payerMessage
@@ -137,7 +139,7 @@ class Disbursement
 
         $response = Http::withHeaders([
             'X-Reference-Id' => $referenceId,
-            'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
+            'X-Target-Environment' => $this->env,
             'Ocp-Apim-Subscription-Key' => $this->config["primary_key"],
             'Content-Type' => 'application/json',
             'Authorization' => "Bearer " . $this->generateToken()
@@ -167,7 +169,7 @@ class Disbursement
     public function checkRefundStatus($refundUuid)
     {
         $response = Http::withHeaders([
-            'X-Target-Environment' => env('APP_MTN_ENV_MODE'),
+            'X-Target-Environment' => $this->env,
             'Ocp-Apim-Subscription-Key' => $this->config["primary_key"],
             'Content-Type' => 'application/json',
             'Authorization' => "Bearer " . $this->generateToken()
