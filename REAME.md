@@ -21,14 +21,18 @@ MTN_MOMO_COLLECTION_CALLBACK_URL=
 ```
 
 # Pour le transfert de fonds
+```
 MTN_MOMO_DISBURSEMENT_PRIMARY_KEY=
 MTN_MOMO_DISBURSEMENT_SECONDARY_KEY=
 MTN_MOMO_DISBURSEMENT_CALLBACK_URL=
+```
 
 # Pour les transferts internationaux (En cours de développement)
+```
 MTN_MOMO_REMITTANCE_PRIMARY_KEY=
 MTN_MOMO_REMITTANCE_SECONDARY_KEY=
 MTN_MOMO_REMITTANCE_CALLBACK_URL=
+```
 
 ## 3. 🚀 Utilisation
 Assurez-vous d’importer la façade
